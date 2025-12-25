@@ -26,6 +26,8 @@ func main() {
 		err = commands.Search(options)
 	case "index":
 		err = commands.Index(options)
+	case "clear-index":
+		err = commands.ClearIndex(options)
 	default:
 		fmt.Printf("Unknown command: %s\n", command)
 		os.Exit(1)

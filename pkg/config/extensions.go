@@ -57,8 +57,80 @@ var AllowedExtensions = map[string]bool{
 
 	// Database
 	".sql": true,
+
+	// Documents (metadata only)
+	".pdf":  true,
+	".docx": true,
+	".xlsx": true,
+	".pptx": true,
+	".doc":  true,
+	".xls":  true,
+	".ppt":  true,
+
+	// Data files (metadata only)
+	".csv": true,
+
+	// Logs (metadata only)
+	".log": true,
+
+	// Media files (metadata only)
+	".mp4":  true,
+	".mov":  true,
+	".avi":  true,
+	".mp3":  true,
+	".wav":  true,
+	".flac": true,
+
+	// Images (metadata only)
+	".jpg":  true,
+	".jpeg": true,
+	".png":  true,
+	".gif":  true,
+	".bmp":  true,
+	".svg":  true,
+	".webp": true,
 }
 
 func IsAllowedExtension(ext string) bool {
 	return AllowedExtensions[ext]
+}
+
+// IgnoredContentExtensions contains file extensions that should be indexed
+// (for metadata) but their content should NOT be read/indexed
+var IgnoredContentExtensions = map[string]bool{
+	// Documents
+	".pdf":  true,
+	".docx": true,
+	".xlsx": true,
+	".pptx": true,
+	".doc":  true,
+	".xls":  true,
+	".ppt":  true,
+
+	// Data files
+	".csv": true,
+
+	// Logs
+	".log": true,
+
+	// Media files
+	".mp4":  true,
+	".mov":  true,
+	".avi":  true,
+	".mp3":  true,
+	".wav":  true,
+	".flac": true,
+
+	// Images
+	".jpg":  true,
+	".jpeg": true,
+	".png":  true,
+	".gif":  true,
+	".bmp":  true,
+	".svg":  true,
+	".webp": true,
+}
+
+func ShouldIgnoreContent(ext string) bool {
+	return IgnoredContentExtensions[ext]
 }

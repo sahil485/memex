@@ -1,0 +1,64 @@
+package config
+
+// AllowedExtensions contains all file extensions that should be indexed
+var AllowedExtensions = map[string]bool{
+	// Plain text
+	".txt": true,
+	".md":  true,
+	".rtf": true,
+
+	// JavaScript/TypeScript
+	".js":  true,
+	".jsx": true,
+	".ts":  true,
+	".tsx": true,
+
+	// Python
+	".py": true,
+
+	// Go
+	".go": true,
+
+	// Java/Kotlin
+	".java": true,
+	".kt":   true,
+
+	// C/C++
+	".c":   true,
+	".cpp": true,
+	".h":   true,
+
+	// Ruby
+	".rb": true,
+
+	// PHP
+	".php": true,
+
+	// Swift
+	".swift": true,
+
+	// Rust
+	".rs": true,
+
+	// Shell
+	".sh":   true,
+	".bash": true,
+
+	// Web
+	".html": true,
+	".css":  true,
+	".scss": true,
+
+	// Config
+	".json": true,
+	".yaml": true,
+	".yml":  true,
+	".xml":  true,
+
+	// Database
+	".sql": true,
+}
+
+func IsAllowedExtension(ext string) bool {
+	return AllowedExtensions[ext]
+}

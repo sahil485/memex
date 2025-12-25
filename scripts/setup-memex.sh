@@ -65,5 +65,17 @@ launchctl load "$PLIST_PATH"
 launchctl start com.memex.meilisearch
 
 echo "✓ Meilisearch configured to run on login and started"
+
+echo "Waiting for Meilisearch to start..."
+for i in {1..10}; do
+    if curl -s http://127.0.0.1:58273/health > /dev/null 2>&1; then
+        echo "✓ Meilisearch is ready"
+        break
+    fi
+    sleep 1
+done
+
+echo "Initializing index..."
+go run ./pkg/client/init.go && echo "✓ Index initialized" || echo "Failed to initialize index"
 echo "✓ memex built and installed!"
 echo "Run with: memex search [options]"

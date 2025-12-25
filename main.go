@@ -19,12 +19,13 @@ func main() {
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:            "Memex",
-		Width:            700,
-		Height:           600,
-		Frameless:        true,
-		StartHidden:      false,
-		HideWindowOnClose: false,
+		Title:             "Memex",
+		Width:             700,
+		Height:            80,
+		Frameless:         true,
+		StartHidden:       false,
+		HideWindowOnClose: true,
+		AlwaysOnTop:       true,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},

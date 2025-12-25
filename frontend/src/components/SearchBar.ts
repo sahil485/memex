@@ -1,6 +1,6 @@
 import { SearchService } from '../services/search';
 import type { SearchResult } from '../types/search';
-import { Quit } from '../wailsjs/runtime/runtime';
+import { WindowHide } from '../wailsjs/runtime/runtime';
 
 export class SearchBar {
   private container: HTMLElement;
@@ -28,7 +28,7 @@ export class SearchBar {
     const container = document.createElement('div');
     container.style.cssText = `
       position: fixed;
-      top: 60px;
+      top: 10px;
       left: 50%;
       transform: translateX(-50%);
       width: 600px;
@@ -117,10 +117,15 @@ export class SearchBar {
 
     this.searchInput.addEventListener('keydown', (e) => this.handleKeyDown(e));
 
-    // Close button
+    // Close button - hide window instead of quit
     const closeBtn = this.container.querySelector('#close-btn');
     closeBtn?.addEventListener('click', () => {
-      Quit();
+      WindowHide();
+    });
+
+    // Hide window when clicking outside or losing focus
+    window.addEventListener('blur', () => {
+      WindowHide();
     });
   }
 
@@ -140,7 +145,7 @@ export class SearchBar {
         break;
       case 'Escape':
         e.preventDefault();
-        this.clearSearch();
+        WindowHide();
         break;
     }
   }

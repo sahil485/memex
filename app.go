@@ -4,8 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
+	"time"
 
 	"github.com/sahil485/memex/pkg/client"
 	"github.com/sahil485/memex/pkg/indexer"
@@ -15,7 +18,9 @@ import (
 
 // App struct
 type App struct {
-	ctx context.Context
+	ctx              context.Context
+	meilisearchCmd   *exec.Cmd
+	meilisearchReady bool
 }
 
 // NewApp creates a new App application struct
@@ -27,6 +32,64 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+
+	// Start MeiliSearch if not already running
+	if !a.GetMeilisearchHealth() {
+		go a.startMeilisearch()
+	}
+}
+
+// startMeilisearch launches MeiliSearch as a background process
+func (a *App) startMeilisearch() error {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return fmt.Errorf("failed to get home directory: %w", err)
+	}
+
+	memexDir := filepath.Join(homeDir, ".memex")
+	meilisearchBinary := filepath.Join(memexDir, "meilisearch")
+
+	// Check if meilisearch binary exists
+	if _, err := os.Stat(meilisearchBinary); os.IsNotExist(err) {
+		return fmt.Errorf("meilisearch binary not found at %s", meilisearchBinary)
+	}
+
+	// Launch MeiliSearch
+	cmd := exec.Command(
+		meilisearchBinary,
+		"--db-path", filepath.Join(memexDir, "data.ms"),
+		"--http-addr", "127.0.0.1:7700",
+		"--no-analytics",
+	)
+
+	// Redirect output to avoid blocking
+	cmd.Stdout = nil
+	cmd.Stderr = nil
+
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("failed to start meilisearch: %w", err)
+	}
+
+	a.meilisearchCmd = cmd
+
+	// Wait for MeiliSearch to be ready
+	for i := 0; i < 30; i++ {
+		time.Sleep(500 * time.Millisecond)
+		if a.GetMeilisearchHealth() {
+			a.meilisearchReady = true
+			fmt.Println("MeiliSearch started successfully")
+			return nil
+		}
+	}
+
+	return fmt.Errorf("meilisearch failed to start within 15 seconds")
+}
+
+// shutdown cleans up MeiliSearch process
+func (a *App) shutdown(ctx context.Context) {
+	if a.meilisearchCmd != nil && a.meilisearchCmd.Process != nil {
+		a.meilisearchCmd.Process.Kill()
+	}
 }
 
 // SearchResult represents a search result for the frontend

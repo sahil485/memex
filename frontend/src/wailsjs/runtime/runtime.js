@@ -5,6 +5,12 @@ export function Quit() {
   }
 }
 
+export function WindowHide() {
+  if (window.runtime && window.runtime.WindowHide) {
+    window.runtime.WindowHide();
+  }
+}
+
 export function EventsOn(eventName, callback) {
   if (window.runtime && window.runtime.EventsOn) {
     window.runtime.EventsOn(eventName, callback);

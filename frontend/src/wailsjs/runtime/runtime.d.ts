@@ -10,3 +10,4 @@ export function LogWarning(message: string): void;
 export function LogError(message: string): void;
 export function LogFatal(message: string): void;
 export function Quit(): void;
+export function WindowHide(): void;

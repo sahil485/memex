@@ -1,40 +1,51 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"github.com/sahil485/memex/internal/commands"
+	"embed"
+	"log"
+
+	"github.com/wailsapp/wails/v2"
+	"github.com/wailsapp/wails/v2/pkg/options"
+	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"github.com/wailsapp/wails/v2/pkg/options/mac"
 )
 
+//go:embed all:frontend/dist
+var assets embed.FS
+
 func main() {
-	args := os.Args[1:]
+	// Create an instance of the app structure
+	app := NewApp()
 
-	if len(args) < 1 {
-		fmt.Println("Usage: memex [command] [options]")
-		os.Exit(1)
-	}
-
-	command := args[0]
-	options := args[1:]
-
-	var err error
-
-	switch command {
-	case "init":
-		err = commands.Init(options)
-	case "search":
-		err = commands.Search(options)
-	case "index":
-		err = commands.Index(options)
-	case "clear-index":
-		err = commands.ClearIndex(options)
-	default:
-		fmt.Printf("Unknown command: %s\n", command)
-		os.Exit(1)
-	}
+	// Create application with options
+	err := wails.Run(&options.App{
+		Title:            "Memex",
+		Width:            700,
+		Height:           600,
+		Frameless:        true,
+		StartHidden:      false,
+		HideWindowOnClose: false,
+		AssetServer: &assetserver.Options{
+			Assets: assets,
+		},
+		BackgroundColour: &options.RGBA{R: 0, G: 0, B: 0, A: 0},
+		OnStartup:        app.startup,
+		Bind: []interface{}{
+			app,
+		},
+		Mac: &mac.Options{
+			TitleBar:             mac.TitleBarHiddenInset(),
+			Appearance:           mac.NSAppearanceNameDarkAqua,
+			WebviewIsTransparent: true,
+			WindowIsTranslucent:  true,
+			About: &mac.AboutInfo{
+				Title:   "Memex",
+				Message: "Accurate, efficient file search for MacOS",
+			},
+		},
+	})
 
 	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 }
